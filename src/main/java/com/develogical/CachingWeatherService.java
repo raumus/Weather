@@ -3,17 +3,20 @@ package com.develogical;
 import com.weather.Day;
 import com.weather.Region;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CachingWeatherService implements WeatherService {
     private final WeatherService delegate;
     private final int maxNumberToKeep;
-    private Map<String, String> weatherCondition = new HashMap<>();
+    private final Clock clock;
+    private Map<String, WeatherCache> weatherCondition = new HashMap<>();
 
-    public CachingWeatherService(WeatherService delegate, int maxNumberToKeep) {
+    public CachingWeatherService(WeatherService delegate, int maxNumberToKeep, Clock clock) {
         this.delegate = delegate;
         this.maxNumberToKeep = maxNumberToKeep;
+        this.clock = clock;
     }
 
     @Override
@@ -24,11 +27,11 @@ public class CachingWeatherService implements WeatherService {
             if(weatherCondition.size() >= maxNumberToKeep){
                 weatherCondition.clear();
             }
-            weatherCondition.put(key, delegate.getWeather(region, day));
+            WeatherCache weatherCache = new WeatherCache(delegate.getWeather(region, day), clock.now());
+            weatherCondition.put(key, weatherCache);
         }
 
-        return weatherCondition.get(key);
+        return weatherCondition.get(key).forecast;
     }
 
 }
-
