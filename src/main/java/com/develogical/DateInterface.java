@@ -2,6 +2,6 @@ package com.develogical;
 
 import java.util.Date;
 
-public interface Clock {
+public interface DateInterface {
     Date now();
 }

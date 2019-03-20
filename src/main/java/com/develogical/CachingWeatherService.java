@@ -10,13 +10,13 @@ import java.util.Map;
 public class CachingWeatherService implements WeatherService {
     private final WeatherService delegate;
     private final int maxNumberToKeep;
-    private final Clock clock;
+    private final DateInterface dateInterface;
     private Map<String, WeatherCache> weatherCondition = new HashMap<>();
 
-    public CachingWeatherService(WeatherService delegate, int maxNumberToKeep, Clock clock) {
+    public CachingWeatherService(WeatherService delegate, int maxNumberToKeep, DateInterface dateInterface) {
         this.delegate = delegate;
         this.maxNumberToKeep = maxNumberToKeep;
-        this.clock = clock;
+        this.dateInterface = dateInterface;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class CachingWeatherService implements WeatherService {
             if(weatherCondition.size() >= maxNumberToKeep){
                 weatherCondition.clear();
             }
-            WeatherCache weatherCache = new WeatherCache(delegate.getWeather(region, day), clock.now());
+            WeatherCache weatherCache = new WeatherCache(delegate.getWeather(region, day), dateInterface.now());
             weatherCondition.put(key, weatherCache);
         }
 
